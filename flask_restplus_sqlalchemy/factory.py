@@ -38,8 +38,15 @@ class ApiModelFactory:
     """ Dict with ``__tablename__, Model``
     """
 
-    def __init__(self, api: Api, db: SQLAlchemy, logger=getLogger(__name__)):
+    def __init__(self, api:Api=None, db:SQLAlchemy=None, logger=getLogger(__name__)):
         self.logger = logger
+        self.api = api
+        self.db = db
+
+        if (api is not None) and (db is not None):
+            self.init_app(api, db)
+
+    def init_app(self, api, db):
         models = db.metadata.tables.items()
 
         for model in models:
@@ -50,7 +57,7 @@ class ApiModelFactory:
                 model)
             self.entities[table_name] = api.model(
                 table_name, self.schema[schema_name])
-        logger.info('Factory Online')
+        self.logger.info('Factory Online')
 
     @staticmethod
     def get_python_type(column) -> type:
